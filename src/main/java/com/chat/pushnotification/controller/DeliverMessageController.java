@@ -20,7 +20,7 @@ public class DeliverMessageController {
 	public @ResponseBody DeliverMessageResponse deliverMessage(@RequestBody DeliverMessageRequest deliverMessageRequest) {
 		boolean isDelivered = false;
 		try {
-			isDelivered = deliverMessageHandler.deliverMessage(deliverMessageRequest.getTo(), deliverMessageRequest.getContent());
+			isDelivered = deliverMessageHandler.deliverMessage(deliverMessageRequest);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

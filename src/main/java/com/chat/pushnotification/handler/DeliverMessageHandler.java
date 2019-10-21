@@ -5,7 +5,8 @@ import javax.inject.Inject;
 import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-import com.chat.pushnotification.model.ServerMessage;
+import com.chat.pushnotification.model.DeliverMessageRequest;
+import com.chat.pushnotification.model.PushMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -19,9 +20,9 @@ public class DeliverMessageHandler {
 //	@Inject
 //	private ConcurrentHashMap<String, ServerDetails> activeConnections;
 
-	public boolean deliverMessage(String recipientId, String messageContent) throws MessagingException, JsonProcessingException {
-		ServerMessage serverMessage = new ServerMessage("server", "testUser", "message from Server");
-		simpMessagingTemplate.convertAndSendToUser(recipientId, "/queue/messages", objectMapper.writeValueAsString(serverMessage));
+	public boolean deliverMessage(DeliverMessageRequest deliverMessageRequest) throws MessagingException, JsonProcessingException {
+		PushMessage pushMessage = new PushMessage(deliverMessageRequest.getFrom(), deliverMessageRequest.getTo(), deliverMessageRequest.getContent(), deliverMessageRequest.getTimestamp());
+		simpMessagingTemplate.convertAndSendToUser(deliverMessageRequest.getTo(), "/queue/messages", objectMapper.writeValueAsString(pushMessage));
 		return true;
 	}
 }

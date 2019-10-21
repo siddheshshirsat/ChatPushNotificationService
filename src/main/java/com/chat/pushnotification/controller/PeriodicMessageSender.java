@@ -7,7 +7,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.chat.pushnotification.model.ServerMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -21,8 +20,8 @@ public class PeriodicMessageSender {
 
    @Scheduled(fixedRate = 1000)
    public void reportCurrentTime() throws MessagingException, JsonProcessingException {
-		ServerMessage serverMessage = new ServerMessage("server", "testUser", "message from Server");
-		simpMessagingTemplate.convertAndSendToUser("testUser", "/queue/messages",
-				objectMapper.writeValueAsString(serverMessage));
+//		ServerMessage serverMessage = new ServerMessage("server", "testUser", "message from Server");
+//		simpMessagingTemplate.convertAndSendToUser("testUser", "/queue/messages",
+//				objectMapper.writeValueAsString(serverMessage));
    }
 }
