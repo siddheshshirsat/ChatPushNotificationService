@@ -44,9 +44,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 		}).setAllowedOrigins("*");
 		//				.withSockJS();
 	}
-
-	@Bean
-	public ObjectMapper getObjectMapper() {
-		return new ObjectMapper();
-	}
 }
