@@ -3,7 +3,6 @@ package com.chat.pushnotification.spring;
 import java.security.Principal;
 import java.util.Map;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -14,8 +13,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 import org.springframework.web.socket.server.RequestUpgradeStrategy;
 import org.springframework.web.socket.server.standard.TomcatRequestUpgradeStrategy;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -33,7 +30,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 		RequestUpgradeStrategy upgradeStrategy = new TomcatRequestUpgradeStrategy();
 		registry.addEndpoint("/webSocketService").setHandshakeHandler(new DefaultHandshakeHandler(upgradeStrategy) {
 			protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
-				System.out.println("Reached..headers = " + request.getHeaders());
+//				System.out.println("Reached..headers = " + request.getURI());
 				return new Principal() {
 					@Override
 					public String getName() {
