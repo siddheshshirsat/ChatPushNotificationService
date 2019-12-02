@@ -7,20 +7,25 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.WebSocketSession;
 
 @Component
 public class ActiveConnections {
-	private Map<String, String> activeConnections;
+	private Map<String, WebSocketSession> activeConnections;
 	
 	@Inject
 	public ActiveConnections() {
 		activeConnections = new ConcurrentHashMap<>();
 	}
 	
-	public void addConnection(String userId) {
-		activeConnections.put(userId, userId);
+	public void addConnection(String userId, WebSocketSession webSocketSession) {
+		activeConnections.put(userId, webSocketSession);
 	}
-	
+
+	public WebSocketSession getWebSocketSession(String userId) {
+		return activeConnections.get(userId);
+	}
+
 	public Set<String> getAllConnections() {
 		return activeConnections.keySet();
 	}

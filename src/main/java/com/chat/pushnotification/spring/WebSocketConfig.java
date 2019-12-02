@@ -1,44 +1,33 @@
 package com.chat.pushnotification.spring;
 
-import java.security.Principal;
-import java.util.Map;
+import javax.inject.Inject;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.server.ServerHttpRequest;
-import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.web.socket.WebSocketHandler;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.server.RequestUpgradeStrategy;
-import org.springframework.web.socket.server.standard.TomcatRequestUpgradeStrategy;
-import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+
+import com.chat.pushnotification.handler.SocketTextHandler;
+import com.chat.pushnotification.state.ActiveConnections;
 
 @Configuration
-@EnableWebSocketMessageBroker
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-
-	@Override
-	public void configureMessageBroker(MessageBrokerRegistry config) {
-		config.enableSimpleBroker("/queue");
-		config.setApplicationDestinationPrefixes("/app");
-		config.setUserDestinationPrefix("/user");
+@EnableWebSocket
+public class WebSocketConfig implements WebSocketConfigurer {
+	@Inject
+	private ActiveConnections activeConnections;
+	
+	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+		registry.addHandler(new SocketTextHandler(activeConnections), "/user");
 	}
-
-	@Override
-	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		RequestUpgradeStrategy upgradeStrategy = new TomcatRequestUpgradeStrategy();
-		registry.addEndpoint("/webSocketService").setHandshakeHandler(new DefaultHandshakeHandler(upgradeStrategy) {
-			protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
-//				System.out.println("Reached..headers = " + request.getURI());
-				return new Principal() {
-					@Override
-					public String getName() {
-						return request.getHeaders().getValuesAsList("userId").get(0);
-					}
-				};
-			}
-		}).setAllowedOrigins("*");
-		//				.withSockJS();
+	
+	@Bean
+	public TaskScheduler taskScheduler() {
+	    ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+	    taskScheduler.setPoolSize(10);
+	    taskScheduler.initialize();
+	    return taskScheduler;
 	}
 }
