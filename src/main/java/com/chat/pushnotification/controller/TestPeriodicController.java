@@ -2,7 +2,6 @@ package com.chat.pushnotification.controller;
 
 import javax.inject.Inject;
 
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.chat.pushnotification.handler.DeliverMessageHandler;
@@ -13,7 +12,7 @@ public class TestPeriodicController {
 	@Inject
 	private DeliverMessageHandler deliverMessageHandler;
 
-	@Scheduled(fixedRate = 1000)
+//	@Scheduled(fixedRate = 1000)
 	public void test() {
 		try {
 			DeliverMessageRequest deliverMessageRequest = new DeliverMessageRequest();
