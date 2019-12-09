@@ -27,7 +27,13 @@ public class DeliverMessageHandler {
 		System.out.println("Reached....pushing message " + pushMessage);
 
 		WebSocketSession webSocketSession = activeConnections.getWebSocketSession(deliverMessageRequest.getTo());
-		webSocketSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(pushMessage)));
+		try {
+			webSocketSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(pushMessage)));
+		} catch(IllegalStateException | NullPointerException ex) {
+			// the client against this webSocketSession was either not present or seems to have disconnected
+			activeConnections.remove(deliverMessageRequest.getTo());
+			return false;
+		}
 		return true;
 	}
 }

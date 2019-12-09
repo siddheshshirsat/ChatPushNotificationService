@@ -29,4 +29,8 @@ public class ActiveConnections {
 	public Set<String> getAllConnections() {
 		return activeConnections.keySet();
 	}
+
+	public void remove(String userId) {
+		activeConnections.remove(userId);
+	}
 }
