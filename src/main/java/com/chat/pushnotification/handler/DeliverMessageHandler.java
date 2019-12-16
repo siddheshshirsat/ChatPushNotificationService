@@ -1,39 +1,25 @@
 package com.chat.pushnotification.handler;
 
 import java.io.IOException;
+import java.util.Queue;
 
 import javax.inject.Inject;
 
 import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
 
 import com.chat.pushnotification.model.DeliverMessageRequest;
 import com.chat.pushnotification.model.PushMessage;
-import com.chat.pushnotification.state.ActiveConnections;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class DeliverMessageHandler {
 	@Inject
-	private ActiveConnections activeConnections;
-
-	@Inject
-	private ObjectMapper objectMapper;
+	private Queue<PushMessage> messageQueue;
 
 	public boolean deliverMessage(DeliverMessageRequest deliverMessageRequest) throws MessagingException, IOException {
 		PushMessage pushMessage = new PushMessage(deliverMessageRequest.getFrom(), deliverMessageRequest.getTo(), deliverMessageRequest.getContent(), deliverMessageRequest.getTimestamp());
-		System.out.println("Reached....pushing message " + pushMessage);
-
-		WebSocketSession webSocketSession = activeConnections.getWebSocketSession(deliverMessageRequest.getTo());
-		try {
-			webSocketSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(pushMessage)));
-		} catch(IllegalStateException | NullPointerException ex) {
-			// the client against this webSocketSession was either not present or seems to have disconnected
-			activeConnections.remove(deliverMessageRequest.getTo());
-			return false;
-		}
+		System.out.println("Reached....enquing message " + pushMessage);
+		messageQueue.add(pushMessage);
 		return true;
 	}
 }
