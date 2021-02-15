@@ -1,22 +1,25 @@
 package com.chat.pushnotification.spring;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
+import javax.jms.ConnectionFactory;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
+import org.springframework.jms.config.JmsListenerContainerFactory;
+import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
+import org.springframework.jms.support.converter.MessageConverter;
+import org.springframework.jms.support.converter.MessageType;
 
-import com.chat.pushnotification.model.PushMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 public class ApplicationConfig {
 	@Bean
-	public ObjectMapper geObjectMapper() {
+	public ObjectMapper objectMapper() {
 		return new ObjectMapper();
 	}
 
@@ -25,13 +28,22 @@ public class ApplicationConfig {
 		return HttpClients.createDefault();
 	}
 
-	@Bean
-	public Queue<PushMessage> getMessageQueue() {
-		return new ConcurrentLinkedQueue<>();
-	}
-
-	@Bean(name = "messageQueueConsumerExecutorService")
-	public ExecutorService getMessageQueueConsumerExecutorService() {
-		return Executors.newFixedThreadPool(10);
-	}
+	// Only required due to defining myFactory in the receiver
+	  @Bean
+	  public JmsListenerContainerFactory<?> pushMessageQueueListenerContainerFactory(
+	      ConnectionFactory connectionFactory,
+	      DefaultJmsListenerContainerFactoryConfigurer configurer) {
+	    DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+	    configurer.configure(factory, connectionFactory);
+	    return factory;
+	  }
+	  
+	// Serialize message content to json using TextMessage
+	  @Bean
+	  public MessageConverter jacksonJmsMessageConverter() {
+	    MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+	    converter.setTargetType(MessageType.TEXT);
+	    converter.setTypeIdPropertyName("_type");
+	    return converter;
+	  }
 }
