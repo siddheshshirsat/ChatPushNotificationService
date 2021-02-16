@@ -21,7 +21,7 @@ public class PushMessageListener {
 	@Inject
 	private ObjectMapper objectMapper;
 
-	@JmsListener(destination = "PushMessageQueue", containerFactory = "pushMessageQueueListenerContainerFactory")
+	@JmsListener(destination = "pushMessageQueue", containerFactory = "pushMessageQueueListenerContainerFactory")
 	public void receivePushMessage(PushMessage pushMessage) {
 		System.out.println("Reached....enquing message " + pushMessage);
 

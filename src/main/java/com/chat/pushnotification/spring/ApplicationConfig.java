@@ -28,22 +28,20 @@ public class ApplicationConfig {
 		return HttpClients.createDefault();
 	}
 
-	// Only required due to defining myFactory in the receiver
-	  @Bean
-	  public JmsListenerContainerFactory<?> pushMessageQueueListenerContainerFactory(
-	      ConnectionFactory connectionFactory,
-	      DefaultJmsListenerContainerFactoryConfigurer configurer) {
-	    DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-	    configurer.configure(factory, connectionFactory);
-	    return factory;
-	  }
-	  
-	// Serialize message content to json using TextMessage
-	  @Bean
-	  public MessageConverter jacksonJmsMessageConverter() {
-	    MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
-	    converter.setTargetType(MessageType.TEXT);
-	    converter.setTypeIdPropertyName("_type");
-	    return converter;
-	  }
+	@Bean
+	public JmsListenerContainerFactory<?> pushMessageQueueListenerContainerFactory(
+			ConnectionFactory connectionFactory,
+			DefaultJmsListenerContainerFactoryConfigurer configurer) {
+		DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+		configurer.configure(factory, connectionFactory);
+		return factory;
+	}
+
+	@Bean
+	public MessageConverter jacksonJmsMessageConverter() {
+		MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+		converter.setTargetType(MessageType.TEXT);
+		converter.setTypeIdPropertyName("_type");
+		return converter;
+	}
 }

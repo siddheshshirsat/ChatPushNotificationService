@@ -23,7 +23,7 @@ public class DeliverMessageController {
 
 		final PushMessage pushMessage = new PushMessage(deliverMessageRequest.getFrom(), deliverMessageRequest.getTo(),
 				deliverMessageRequest.getContent(), deliverMessageRequest.getTimestamp());
-		jmsTemplate.convertAndSend("PushMessageQueue", pushMessage);
+		jmsTemplate.convertAndSend("pushMessageQueue", pushMessage);
 		return new DeliverMessageResponse(true);
 	}
 }
