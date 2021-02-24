@@ -10,6 +10,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import com.chat.pushnotification.model.PushMessage;
+import com.chat.pushnotification.persistence.PendingMessageRepository;
 import com.chat.pushnotification.state.ActiveConnections;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -21,15 +22,22 @@ public class PushMessageListener {
 	@Inject
 	private ObjectMapper objectMapper;
 
+	@Inject
+	private PendingMessageRepository pendingMessageRepository;
+
 	@JmsListener(destination = "pushMessageQueue", containerFactory = "pushMessageQueueListenerContainerFactory")
 	public void receivePushMessage(PushMessage pushMessage) {
-		System.out.println("Reached....enquing message " + pushMessage);
-
 		final WebSocketSession webSocketSession = activeConnections.getWebSocketSession(pushMessage.getTo());
-		try {
-			webSocketSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(pushMessage)));
-		} catch (IllegalStateException | NullPointerException | IOException ex) {
-			ex.printStackTrace();
+		if(webSocketSession != null) {
+			try {
+				webSocketSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(pushMessage)));
+				System.out.println("Reached....pushed message " + pushMessage);
+			} catch (IllegalStateException | NullPointerException | IOException ex) {
+				ex.printStackTrace();
+			}
+		} else {
+			pendingMessageRepository.save(pushMessage);
+			System.out.println("Reached....saved message " + pushMessage);
 		}
 	}
 }
